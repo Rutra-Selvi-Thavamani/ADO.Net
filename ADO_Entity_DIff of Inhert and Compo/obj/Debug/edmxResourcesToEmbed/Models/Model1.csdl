@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="AdventureWorksModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Address">
+    <Key>
+      <PropertyRef Name="AddressID" />
+    </Key>
+    <Property Name="AddressID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="AddressLine1" Type="String" MaxLength="60" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="AddressLine2" Type="String" MaxLength="60" FixedLength="false" Unicode="true" />
+    <Property Name="City" Type="String" MaxLength="30" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="StateProvinceID" Type="Int32" Nullable="false" />
+    <Property Name="PostalCode" Type="String" MaxLength="15" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="SpatialLocation" Type="Geography" />
+    <Property Name="rowguid" Type="Guid" Nullable="false" />
+    <Property Name="ModifiedDate" Type="DateTime" Nullable="false" Precision="3" />
+  </EntityType>
+  <EntityType Name="AddressType">
+    <Key>
+      <PropertyRef Name="AddressTypeID" />
+    </Key>
+    <Property Name="AddressTypeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="rowguid" Type="Guid" Nullable="false" />
+    <Property Name="ModifiedDate" Type="DateTime" Nullable="false" Precision="3" />
+  </EntityType>
+  <EntityType Name="EmailAddress">
+    <Key>
+      <PropertyRef Name="BusinessEntityID" />
+      <PropertyRef Name="EmailAddressID" />
+    </Key>
+    <Property Name="BusinessEntityID" Type="Int32" Nullable="false" />
+    <Property Name="EmailAddressID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="EmailAddress1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="rowguid" Type="Guid" Nullable="false" />
+    <Property Name="ModifiedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <NavigationProperty Name="Person" Relationship="Self.FK_EmailAddress_Person_BusinessEntityID" FromRole="EmailAddress" ToRole="Person" />
+  </EntityType>
+  <EntityType Name="Password">
+    <Key>
+      <PropertyRef Name="BusinessEntityID" />
+    </Key>
+    <Property Name="BusinessEntityID" Type="Int32" Nullable="false" />
+    <Property Name="PasswordHash" Type="String" MaxLength="128" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="PasswordSalt" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="rowguid" Type="Guid" Nullable="false" />
+    <Property Name="ModifiedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <NavigationProperty Name="Person" Relationship="Self.FK_Password_Person_BusinessEntityID" FromRole="Password" ToRole="Person" />
+  </EntityType>
+  <EntityType Name="Person">
+    <Key>
+      <PropertyRef Name="BusinessEntityID" />
+    </Key>
+    <Property Name="BusinessEntityID" Type="Int32" Nullable="false" />
+    <Property Name="PersonType" Type="String" MaxLength="2" FixedLength="true" Unicode="true" Nullable="false" />
+    <Property Name="NameStyle" Type="Boolean" Nullable="false" />
+    <Property Name="Title" Type="String" MaxLength="8" FixedLength="false" Unicode="true" />
+    <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="MiddleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Suffix" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Name="EmailPromotion" Type="Int32" Nullable="false" />
+    <Property Name="AdditionalContactInfo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="Demographics" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="rowguid" Type="Guid" Nullable="false" />
+    <Property Name="ModifiedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <NavigationProperty Name="EmailAddresses" Relationship="Self.FK_EmailAddress_Person_BusinessEntityID" FromRole="Person" ToRole="EmailAddress" />
+    <NavigationProperty Name="Password" Relationship="Self.FK_Password_Person_BusinessEntityID" FromRole="Person" ToRole="Password" />
+  </EntityType>
+  <Association Name="FK_EmailAddress_Person_BusinessEntityID">
+    <End Role="Person" Type="Self.Person" Multiplicity="1" />
+    <End Role="EmailAddress" Type="Self.EmailAddress" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Person">
+        <PropertyRef Name="BusinessEntityID" />
+      </Principal>
+      <Dependent Role="EmailAddress">
+        <PropertyRef Name="BusinessEntityID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Password_Person_BusinessEntityID">
+    <End Role="Person" Type="Self.Person" Multiplicity="1" />
+    <End Role="Password" Type="Self.Password" Multiplicity="0..1" />
+    <ReferentialConstraint>
+      <Principal Role="Person">
+        <PropertyRef Name="BusinessEntityID" />
+      </Principal>
+      <Dependent Role="Password">
+        <PropertyRef Name="BusinessEntityID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="AdventureWorksEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Addresses" EntityType="Self.Address" />
+    <EntitySet Name="AddressTypes" EntityType="Self.AddressType" />
+    <EntitySet Name="EmailAddresses" EntityType="Self.EmailAddress" />
+    <EntitySet Name="Passwords" EntityType="Self.Password" />
+    <EntitySet Name="People" EntityType="Self.Person" />
+    <AssociationSet Name="FK_EmailAddress_Person_BusinessEntityID" Association="Self.FK_EmailAddress_Person_BusinessEntityID">
+      <End Role="Person" EntitySet="People" />
+      <End Role="EmailAddress" EntitySet="EmailAddresses" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Password_Person_BusinessEntityID" Association="Self.FK_Password_Person_BusinessEntityID">
+      <End Role="Person" EntitySet="People" />
+      <End Role="Password" EntitySet="Passwords" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
